@@ -1,0 +1,80 @@
+import pandas as pd
+import datetime 
+import matplotlib.pyplot as plt
+import numpy as np 
+
+data = pd.read_csv('Stock_Data_2_v2.csv', parse_dates=['Date'])  #read Stock_Data_2_v2.csv 
+
+data['Date'] = pd.to_datetime(data['Date'], format = '%Y-%m-%d') #"Date" column splitted into Year-Month-Day and sorted in ascending order 
+data.sort_values(by='Date', ascending=True)                      #"Date" column sorted in ascending order
+
+data.to_csv('new_file.csv', index=False)                         #output of the sorted data frame in a new csv file named "my_new_file.csv"            
+new_file
+
+
+#Finding the list of means:
+
+calculations_list = new_file['Close'] 
+list_mean = [] 
+for number in range(len(calculations_list)): 
+  data_list = calculations_list[:number+1] 
+  sum = 0.0 
+  lenghth = len(data_list) 
+  if lenghth == 1: 
+    mean = 0
+    list_mean.append(mean)
+  else: 
+      for num in data_list: 
+        sum = sum + num 
+      mean = sum / len(data_list)
+      list_mean.append(mean) 
+new_file['Mean'] = list_mean 
+
+#Finding the list of medians: 
+
+list_median = []
+for number in range(len(calculations_list)):
+  data_list = calculations_list[:number+1]
+  data_list.sort_values(ascending=True)
+  size = len(data_list)
+  midPos = size // 2 
+  if size == 1: 
+    med = 0
+  else:
+    if size % 2 == 0:   # even elements
+        med = (calculations_list[midPos] + calculations_list[midPos-1])/2
+    else:
+        med = calculations_list[midPos]
+  list_median.append(med)
+
+new_file['Median'] = list_median  
+
+
+
+#Finding the Up/Down: 
+
+new_file["Up/Down"] = new_file["Close"].diff() 
+ 
+#Finding the change percentage: 
+
+new_file["Change%"] = new_file["Up/Down"] / new_file["Close"].shift(1) * 100
+
+
+#Plotting all of our results: 
+
+plt.figure(figsize=(15,15))  
+
+plt.xlabel("year")
+plt.ylabel("value") 
+plt.title("Data of Stocks")
+
+plt.plot(new_file.Date, new_file.Close, label = "Close") 
+plt.plot(new_file.Date, new_file.Mean, label = "Mean")
+plt.plot(new_file.Date, new_file.Median, label = "Median")
+plt.plot(new_file.Date, new_file["Up/Down"], label = "Up/Down")
+plt.plot(new_file.Date, new_file["Change%"], label = "Change%") 
+ 
+
+plt.legend()
+plt.savefig('data_of_stocks.png')
+plt.show()
